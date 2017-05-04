@@ -3,9 +3,13 @@
     padding: 0;
 }
 
+html, body {
+    height: 100vh;
+}
+
 #container{
-    margin-left: 20px;
-    margin-top: 20px;
+    height: 100vh;
+    width: 50%;
 }
 
 table {
@@ -13,21 +17,24 @@ table {
     border-spacing: 0;
 }
 
+#chessboard, #left-table {
+    height: 90%;
+}
+#bottom-table {
+    height: 10%;
+}
+
 #chessboard, #bottom-table{
     padding: 0px;
     margin: 0 auto;
-    margin-left: 25px;
     border: 2px solid #181818;
     text-align: center;
+    width: 80%;
 }
 
 #chessboard tr td {
-    width: 60px;
-    height: 60px;
-    font-size: 45px;
 }
 #bottom-table tr td {
-    width: 60px;
     text-align: center;
 }
 #chessboard tr:nth-child(2n) td:nth-child(2n+1) {
@@ -38,10 +45,5 @@ table {
     background: #9f9f9f;
 }
 #left-table {
-    height: 490px;
     float: left;
-}
-#bottom-table {
-    border: none;
-    margin-top: 15px;
 }
