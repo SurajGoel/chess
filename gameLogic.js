@@ -156,13 +156,14 @@ function GameLogic() {
     var moves = [];
 
     var move_mode = false;
-    var currentlySelected;
+    var cSelected, cTarget;
+    var turn = 'white';
 
     this.validMoves = function (position) {
         var hpos = position.charAt(0);
         var vpos = position.charAt(1);
         moves.length = 0;
-
+        if(pType[cgState[hpos][vpos]].color !== turn) return moves;
         switch(cgState[hpos][vpos]) {
 
             case piece.black.pawn: {
@@ -308,12 +309,25 @@ function GameLogic() {
 
     this.moveMode = function (val, position) {
         move_mode = val;
-        currentlySelected = position;
+        cSelected = position;
     };
 
     this.checkChessMove = function (target) {
+        cTarget = target;
         var hpos = target.charAt(0);
         var vpos = target.charAt(1);
+        var pTarget = cgState[hpos][vpos];
+        var source = cgState[cSelected.charAt(0)][cSelected.charAt(1)];
+        if(pTarget === null) return true;
+        if(pType[pTarget].color !== pType[source].color) return true;
+        return false;
+    };
 
+    this.makeChessMove = function () {
+        var temp = cgState[cSelected.charAt(0)][cSelected.charAt(1)];
+        cgState[cSelected.charAt(0)][cSelected.charAt(1)] = null;
+        cgState[cTarget.charAt(0)][cTarget.charAt(1)] = temp;
+        if(turn === 'white') turn = 'black';
+        else turn = 'white';
     }
 }

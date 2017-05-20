@@ -75,7 +75,7 @@ var model = function () {
      */
     this.getPiecesData = function () {
         return data;
-    }
+    };
 
     this.enableMoveMode = function (position) {
         gameLogic.moveMode(true, position);
@@ -86,7 +86,11 @@ var model = function () {
     };
 
     this.checkMove = function (target) {
-        gameLogic.checkChessMove(target);
+        return gameLogic.checkChessMove(target);
+    };
+
+    this.makeMove = function () {
+        gameLogic.makeChessMove();
     }
 };
 
@@ -98,7 +102,7 @@ var model = function () {
 var view = function () {
 
     var move_mode = false;
-    var valid_moves;
+    var valid_moves, cSelected, cTarget;
     this.createChessBoard = function (data) {
         $('#chessboard').append(data);
     };
@@ -139,9 +143,10 @@ var view = function () {
         });
     };
 
-    this.enableMoveMode = function (validMoves) {
+    this.enableMoveMode = function (source, validMoves) {
         move_mode = true;
         valid_moves = validMoves;
+        cSelected = source;
         for(var i in validMoves)
             $('.'+validMoves[i]).addClass('highlight');
     };
@@ -149,7 +154,17 @@ var view = function () {
     this.disableMoveMode = function () {
         move_mode = false;
         for(var i in valid_moves)
-            $('.'+valid_moves[i].removeClass('highlight'));
+            $('.'+valid_moves[i]).removeClass('highlight');
+    };
+
+    this.makeMove = function (target) {
+        cTarget = target.split(' ');
+        var temp = $('.'+cSelected).html();
+        console.log(cTarget);
+        $('.'+cSelected).html('');
+        $('.'+cTarget).html(temp);
+        for(var i in valid_moves)
+            $('.'+valid_moves[i]).removeClass('highlight');
     }
 };
 
@@ -175,9 +190,14 @@ var controller = function () {
 
     function click1(objectClicked) {
         $('#chessboard tr td').unbind('click');
-        var validMoves = myModel.getValidMoves($(this));
+        var validMoves = myModel.getValidMoves(objectClicked);
+        console.log(validMoves);
+        if(validMoves.length === 0) {
+            cancelMove();
+            return;
+        }
         myModel.enableMoveMode(objectClicked.attr('class'));
-        myView.enableMoveMode(validMoves);
+        myView.enableMoveMode(objectClicked.attr('class'), validMoves);
         for(var i in validMoves) {
             $('.'+validMoves[i]).click(function () {
                 moveClick($(this))
@@ -188,10 +208,12 @@ var controller = function () {
 
     function moveClick(objectClicked) {
         $('#chessboard tr td').unbind('click');
-        myModel.checkMove(objectClicked.attr('class'));
+        if(!myModel.checkMove(objectClicked.attr('class'))) return;
         myModel.makeMove();
-        myView.makeMove();
-        $('#chessboard tr td').click(click1);
+        myView.makeMove(objectClicked.attr('class'));
+        $('#chessboard tr td').click(function () {
+            click1($(this));
+        });
     }
 
     function cancelMove() {
