@@ -8,7 +8,7 @@ $(document).ready(function () {
  * Takes Order from Controller.
  */
 var model = function () {
-   // var gameLogic = new GameLogic();
+    var gameLogic = new GameLogic();
 
     var data = {};
     data.pawnBlack = '&#9823';
@@ -16,10 +16,10 @@ var model = function () {
     data.piecesWhite = ['&#9814', '&#9816', '&#9815', '&#9813', '&#9812', '&#9815', '&#9816', '&#9814'];
     data.piecesBlack = ['&#9820', '&#9822', '&#9821', '&#9819', '&#9818', '&#9821', '&#9822', '&#9820'];
 
-    /*this.getValidMoves = function (cell) {
+    this.getValidMoves = function (cell) {
         if($.trim(cell.html())=='') return null;
-        return gameLogic.validMoves(cell)
-    };*/
+        return gameLogic.validMoves(cell.attr('class'));
+    };
 
     /**
      * Creates Chess Board data that will be fed directly to the chessBoard HTML Element.
@@ -76,6 +76,18 @@ var model = function () {
     this.getPiecesData = function () {
         return data;
     }
+
+    this.enableMoveMode = function (position) {
+        gameLogic.moveMode(true, position);
+    };
+
+    this.disableMoveMode = function () {
+        gameLogic.moveMode(false);
+    };
+
+    this.checkMove = function (target) {
+        gameLogic.checkChessMove(target);
+    }
 };
 
 /**
@@ -84,6 +96,9 @@ var model = function () {
  * Change the UI directly. Takes Order from Controller part.
  */
 var view = function () {
+
+    var move_mode = false;
+    var valid_moves;
     this.createChessBoard = function (data) {
         $('#chessboard').append(data);
     };
@@ -122,6 +137,19 @@ var view = function () {
                 index++;
             });
         });
+    };
+
+    this.enableMoveMode = function (validMoves) {
+        move_mode = true;
+        valid_moves = validMoves;
+        for(var i in validMoves)
+            $('.'+validMoves[i]).addClass('highlight');
+    };
+
+    this.disableMoveMode = function () {
+        move_mode = false;
+        for(var i in valid_moves)
+            $('.'+valid_moves[i].removeClass('highlight'));
     }
 };
 
@@ -141,8 +169,36 @@ var controller = function () {
     myView.createBottomTable(myModel.getBottomTableData());
     myView.populateChessBoard(myModel.getPiecesData());
 
-    $('#chessboard tr td').click(function (e) {
-        if(e) console.log(e);
+    $('#chessboard tr td').click(function () {
+        click1($(this));
+    });
+
+    function click1(objectClicked) {
+        $('#chessboard tr td').unbind('click');
         var validMoves = myModel.getValidMoves($(this));
-    })
+        myModel.enableMoveMode(objectClicked.attr('class'));
+        myView.enableMoveMode(validMoves);
+        for(var i in validMoves) {
+            $('.'+validMoves[i]).click(function () {
+                moveClick($(this))
+            });
+        }
+        objectClicked.click(cancelMove);
+    }
+
+    function moveClick(objectClicked) {
+        $('#chessboard tr td').unbind('click');
+        myModel.checkMove(objectClicked.attr('class'));
+        myModel.makeMove();
+        myView.makeMove();
+        $('#chessboard tr td').click(click1);
+    }
+
+    function cancelMove() {
+        myModel.disableMoveMode();
+        myView.disableMoveMode();
+        $('#chessboard tr td').click(function () {
+            click1($(this));
+        });
+    }
 };

@@ -20,57 +20,57 @@ function GameLogic() {
     };
 
     var pType = {
-        '$#9817' : {
-            color : 'black',
-            type : 'pawn'
-        },
-        '$#9814' : {
-            color : 'black',
-            type : 'rook'
-        },
-        '$#9816' : {
-            color : 'black',
-            type : 'knight'
-        },
-        '$#9815' : {
-            color : 'black',
-            type : 'bishop'
-        },
-        '$#9813' : {
-            color : 'black',
-            type : 'queen'
-        },
-        '$#9812' : {
-            color : 'black',
-            type : 'king'
-        },
-        '$#9823' : {
+        '&#9817' : {
             color : 'white',
             type : 'pawn'
         },
-        '$#9820' : {
+        '&#9814' : {
             color : 'white',
             type : 'rook'
         },
-        '$#9822' : {
+        '&#9816' : {
             color : 'white',
             type : 'knight'
         },
-        '$#9821' : {
+        '&#9815' : {
             color : 'white',
             type : 'bishop'
         },
-        '$#9819' : {
+        '&#9813' : {
             color : 'white',
             type : 'queen'
         },
-        '$#9818' : {
+        '&#9812' : {
             color : 'white',
+            type : 'kingw'
+        },
+        '&#9823' : {
+            color : 'black',
+            type : 'pawn'
+        },
+        '&#9820' : {
+            color : 'black',
+            type : 'rook'
+        },
+        '&#9822' : {
+            color : 'black',
+            type : 'knight'
+        },
+        '&#9821' : {
+            color : 'black',
+            type : 'bishop'
+        },
+        '&#9819' : {
+            color : 'black',
+            type : 'queen'
+        },
+        '&#9818' : {
+            color : 'black',
             type : 'king'
         }
     };
 
-    var cgState = {
+    var cgState =   {
         A : {
             1: piece.black.rook,
             2: piece.black.pawn,
@@ -153,134 +153,167 @@ function GameLogic() {
         }
     };
 
-    function validMoves(position) {
+    var moves = [];
+
+    var move_mode = false;
+    var currentlySelected;
+
+    this.validMoves = function (position) {
         var hpos = position.charAt(0);
         var vpos = position.charAt(1);
-        var moves = [];
+        moves.length = 0;
 
         switch(cgState[hpos][vpos]) {
 
             case piece.black.pawn: {
-                if(pType[cgState[hpos][incr(vpos)]].color != "black") moves.add(hpos+incr(vpos));
-                if(pType[cgState[dcr(hpos)][incr(vpos)]].color != "black") moves.add(dcr(hpos)+incr(vpos));
-                if(pType[cgState[incr(hpos)][incr(vpos)]].color != "black") moves.add(incr(hpos+incr(vpos)));
+                if(cgState[hpos][incr(vpos)] == null) moves.push(hpos + incr(vpos));
+                if(cgState[incr(hpos)] != undefined)
+                    if(cgState[incr(hpos)][incr(vpos)] != null)
+                        if(pType[cgState[incr(hpos)][incr(vpos)]].color != "black") moves.push(incr(hpos) + incr(vpos));
+                if(cgState[dcr(hpos)] != undefined)
+                    if(cgState[dcr(hpos)][incr(vpos)] != null)
+                        if(pType[cgState[dcr(hpos)][incr(vpos)]].color != "black") moves.push(dcr(hpos) + incr(vpos));
                 break;
             }
 
             case piece.white.pawn: {
-                if(pType[cgState[hpos][dcr(vpos)].color != "white"]) moves.add(hpos+dcr(vpos));
-                if(pType[cgState[dcr(hpos)][dcr(vpos)]].color != "white") moves.add(dcr(hpos)+dcr(vpos));
-                if(pType[cgState][incr(hpos)][dcr(vpos)].color != "white") moves.add(incr(hpos)+dcr(vpos));
+                if(cgState[hpos][dcr(vpos)] == null) moves.push(hpos + dcr(vpos));
+                if(cgState[incr(hpos)] != undefined)
+                    if(cgState[incr(hpos)][dcr(vpos)] != null)
+                        if(pType[cgState[incr(hpos)][dcr(vpos)]].color != "white") moves.push(incr(hpos) + dcr(vpos));
+                if(cgState[dcr(hpos)] != undefined)
+                    if(cgState[dcr(hpos)][dcr(vpos)] != null)
+                        if(pType[cgState[dcr(hpos)][dcr(vpos)]].color != "white") moves.push(dcr(hpos) + dcr(vpos));
                 break;
             }
 
             case piece.black.rook: {
-                checkRook("black", hpos, vpos, moves);
+                checkRook("black", hpos, vpos);
                 break;
             }
 
             case piece.white.rook: {
-                checkRook("white", hpos, vpos, moves);
+                checkRook("white", hpos, vpos);
                 break;
             }
 
             case piece.white.knight: {
+                checkKnight("white", hpos, vpos);
                 break;
             }
 
             case piece.black.knight: {
+                checkKnight("black", hpos, vpos);
                 break;
             }
 
             case piece.white.bishop: {
+                checkBishop("white", hpos, vpos);
                 break;
             }
 
             case piece.black.bishop: {
+                checkBishop("black", hpos, vpos);
                 break;
             }
 
             case piece.white.queen: {
+                checkQueen("white", hpos, vpos);
                 break;
             }
 
             case piece.black.queen: {
+                checkQueen("black", hpos, vpos);
                 break;
             }
 
             case piece.white.king: {
+                checkKing("white", hpos, vpos);
                 break;
             }
 
             case piece.black.king: {
-
+                checkKing("black", hpos, vpos);
             }
         }
         return moves;
-    }
+    };
 
+    function checkRook(cmpColor, hpos, vpos) {
+        var thpos = hpos, tvpos = vpos;
+        while(checkAndAdd((thpos), (tvpos = incr(tvpos)), cmpColor));
+        thpos = hpos; tvpos = vpos;
+        while(checkAndAdd((thpos), (tvpos = dcr(tvpos)), cmpColor));
+        thpos = hpos; tvpos = vpos;
+        while(checkAndAdd((thpos = incr(thpos)), (tvpos), cmpColor));
+        thpos = hpos; tvpos = vpos;
+        while(checkAndAdd((thpos = dcr(thpos)), (tvpos), cmpColor));
+    }
+    function checkKnight(cmpColor, hpos, vpos) {
+        var thpos = hpos, tvpos = vpos;
+        checkAndAdd(incr(incr(thpos)), incr(tvpos), cmpColor);
+        checkAndAdd(incr(incr(thpos)), dcr(tvpos), cmpColor);
+        checkAndAdd(incr(thpos), incr(incr(tvpos)), cmpColor);
+        checkAndAdd(dcr(thpos), incr(incr(tvpos)), cmpColor);
+        checkAndAdd(dcr(dcr(thpos), incr(tvpos)), cmpColor);
+        checkAndAdd(dcr(dcr(thpos)), dcr(tvpos), cmpColor);
+        checkAndAdd(dcr(thpos), dcr(dcr(tvpos), cmpColor));
+        checkAndAdd(incr(thpos), dcr(dcr(tvpos)), cmpColor);
+    }
+    function checkBishop(cmpColor, hpos, vpos) {
+        var thpos = hpos, tvpos = vpos;
+        while(checkAndAdd((thpos = incr(thpos)), (tvpos = incr(tvpos)), cmpColor));
+        thpos = hpos; tvpos = vpos;
+        while(checkAndAdd((thpos = dcr(thpos)),(tvpos = dcr(tvpos)), cmpColor));
+        thpos = hpos; tvpos = vpos;
+        while(checkAndAdd((thpos = dcr(thpos)), (tvpos = incr(tvpos)), cmpColor));
+        thpos = hpos; tvpos = vpos;
+        while(checkAndAdd((thpos = incr(thpos)), (tvpos = dcr(tvpos)), cmpColor));
+    }
+    function checkQueen(cmpColor, hpos, vpos) {
+        checkBishop(cmpColor, hpos, vpos);
+        checkRook(cmpColor, hpos, vpos);
+    }
+    function checkKing(cmpColor, hpos, vpos) {
+        var thpos = hpos, tvpos = vpos;
+        checkAndAdd(thpos, incr(tvpos), cmpColor);
+        checkAndAdd(thpos, dcr(tvpos), cmpColor);
+        checkAndAdd(incr(thpos), tvpos, cmpColor);
+        checkAndAdd(dcr(thpos), tvpos, cmpColor);
+        checkAndAdd(incr(thpos), incr(tvpos), cmpColor);
+        checkAndAdd(incr(thpos), dcr(tvpos), cmpColor);
+        checkAndAdd(dcr(thpos), incr(tvpos), cmpColor);
+        checkAndAdd(dcr(thpos), dcr(tvpos), cmpColor);
+    }
     function incr(char) {
         return String.fromCharCode(char.charCodeAt(0)+1);
     }
     function dcr(char) {
         return String.fromCharCode(char.charCodeAt(0)-1);
     }
-    function checkRook(cmpColor, hpos, vpos, moves) {
-        var thpos = hpos, tvpos = vpos;
-        var temp;
-        while(1) {
-            temp = cgState[thpos][(tvpos = incr(tvpos))];
-            if(temp == undefined || pType[temp].color == cmpColor) break;
-            if(temp == null) moves.add(thpos+tvpos);
-            if(pType[temp].color != cmpColor) {
-                moves.add(thpos+tvpos);
-                break;
-            }
+    function checkAndAdd(thpos, tvpos, cmpColor) {
+        if(cgState[thpos] === undefined) return 0;
+        if(cgState[thpos][tvpos] === undefined) return 0;
+        var temp = cgState[thpos][tvpos];
+        if (temp === null) {
+            moves.push(thpos+tvpos);
+            return 1;
         }
-
-        thpos = hpos; tvpos = vpos;
-        while(1) {
-            temp = cgState[thpos][(tvpos = dcr(tvpos))];
-            if(temp == undefined || pType[temp].color == cmpColor) break;
-            if(temp == null) moves.add(thpos+tvpos);
-            if(pType[temp].color != cmpColor) {
-                moves.add(thpos+tvpos);
-                break;
-            }
-        }
-
-        thpos = hpos; tvpos = vpos;
-        while(1) {
-            temp = cgState[(thpos = incr(thpos))][vpos];
-            if(temp == undefined || pType[temp].color == cmpColor) break;
-            if(temp == null) moves.add(thpos+tvpos);
-            if(pType[temp].color != cmpColor) {
-                moves.add(thpos+tvpos);
-                break;
-            }
-        }
-
-        thpos = hpos; tvpos = vpos;
-        while(1) {
-            temp = cgState[(thpos = dcr(thpos))][vpos];
-            if(temp == undefined || pType[temp].color == cmpColor) break;
-            if(temp == null) moves.add(thpos+tvpos);
-            if(pType[temp].color != cmpColor) {
-                moves.add(thpos+tvpos);
-                break;
-            }
+        if (pType[temp].color === cmpColor) return 0;
+        if (pType[temp].color !== cmpColor) {
+            moves.push(thpos + tvpos);
+            return 0;
         }
     }
-    function checkKnight(cmpColor, hpos, vpos, moves) {
 
-    }
-    function checkBishop(cmpColor, hpos, vpos, moves) {
+    this.moveMode = function (val, position) {
+        move_mode = val;
+        currentlySelected = position;
+    };
 
-    }
-    function checkQueen(cmpColor, hpos, vpos, moves) {
-
-    }
-    function checkKing(cmpColor, hpos, vpos, moves) {
+    this.checkChessMove = function (target) {
+        var hpos = target.charAt(0);
+        var vpos = target.charAt(1);
 
     }
 }
