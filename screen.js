@@ -10,12 +10,17 @@ $(document).ready(function () {
 var model = function () {
     var gameLogic = new GameLogic();
 
-    var data = {};
+    var data = {}; // Quick piece UNICODE format to feed the view part via controller.
     data.pawnBlack = '&#9823';
     data.pawnWhite = '&#9817';
     data.piecesWhite = ['&#9814', '&#9816', '&#9815', '&#9813', '&#9812', '&#9815', '&#9816', '&#9814'];
     data.piecesBlack = ['&#9820', '&#9822', '&#9821', '&#9819', '&#9818', '&#9821', '&#9822', '&#9820'];
 
+    /**
+     * Abstraction that returns all the valid moves possible with the clicked chess piece.
+     * @param cell
+     * @return {null}
+     */
     this.getValidMoves = function (cell) {
         if($.trim(cell.html())=='') return null;
         return gameLogic.validMoves(cell.attr('class'));
@@ -85,10 +90,17 @@ var model = function () {
         gameLogic.moveMode(false);
     };
 
+    /**
+     * Check with the model's game State whether this move is possible.
+     * @param target
+     */
     this.checkMove = function (target) {
         return gameLogic.checkChessMove(target);
     };
 
+    /**
+     * Making necessary changes in the model's gameLogic structure when actual move is made.
+     */
     this.makeMove = function () {
         gameLogic.makeChessMove();
     }
@@ -166,6 +178,10 @@ var view = function () {
             $('.'+valid_moves[i]).removeClass('highlight');
     };
 
+    /**
+     * View part of the make move. Necessary UI changes are made.
+     * @param target
+     */
     this.makeMove = function (target) {
         movesMade++;
         cTarget = target.split(' ')[0];
@@ -178,6 +194,9 @@ var view = function () {
         updateViewTable();
     };
 
+    /**
+     * Updating the Moves Table with every move.
+     */
     function updateViewTable() {
         if($('#turn').html() == "White") $('#turn').html("Black");
         else $('#turn').html("White");
@@ -208,6 +227,11 @@ var controller = function () {
         click1($(this));
     });
 
+    /**
+     * The normal click function a square piece will perform.
+     * Board will highlight the possible moves made. Clicking on the same square will cancel the move.
+     * @param objectClicked
+     */
     function click1(objectClicked) {
         $('#chessboard tr td').unbind('click');
         var validMoves = myModel.getValidMoves(objectClicked);
@@ -226,6 +250,10 @@ var controller = function () {
         objectClicked.click(cancelMove);
     }
 
+    /**
+     * This click function is registered to all those squares where a piece can move.
+     * @param objectClicked
+     */
     function moveClick(objectClicked) {
         $('#chessboard tr td').unbind('click');
         if(!myModel.checkMove(objectClicked.attr('class'))) return;
@@ -236,6 +264,9 @@ var controller = function () {
         });
     }
 
+    /**
+     * When the click/move is cancelled. Normal click function is restored.
+     */
     function cancelMove() {
         myModel.disableMoveMode();
         myView.disableMoveMode();

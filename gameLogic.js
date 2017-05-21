@@ -72,6 +72,8 @@ function GameLogic() {
         }
     };
 
+    // Maintain the current Game state internally to drive all the process further.
+    // Not relying on data provided by the user.
     var cgState =   {
         A : {
             1: piece.black.rook,
@@ -155,12 +157,19 @@ function GameLogic() {
         }
     };
 
+    // Variable to hold current valid moves.
     var moves = [];
 
     var move_mode = false;
     var cSelected, cTarget;
     var turn = 'white';
     var cmpColor;
+
+    /**
+     * The function that returns the valid moves for the piece at "position"
+     * @param position
+     * @return {Array}
+     */
     this.validMoves = function (position) {
         var hpos = position.charAt(0);
         var vpos = position.charAt(1);
@@ -244,6 +253,12 @@ function GameLogic() {
         }
         return moves;
     };
+
+    /**
+     * Helper functions for the valid moves calculation.
+     * @param hpos
+     * @param vpos
+     */
 
     function checkRook(hpos, vpos) {
         var thpos = hpos, tvpos = vpos;
