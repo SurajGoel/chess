@@ -102,6 +102,7 @@ var model = function () {
 var view = function () {
 
     var move_mode = false;
+    var movesMade = 0, turn = 'white';
     var valid_moves, cSelected, cTarget;
     this.createChessBoard = function (data) {
         $('#chessboard').append(data);
@@ -141,6 +142,14 @@ var view = function () {
                 index++;
             });
         });
+
+        for(var i=3 ; i<=6 ; i++) {
+            $('#chessboard tr:nth-child('+i+')').each(function () {
+                $(this).children().each(function () {
+                    $(this).html('&nbsp');
+                })
+            })
+        }
     };
 
     this.enableMoveMode = function (source, validMoves) {
@@ -158,13 +167,24 @@ var view = function () {
     };
 
     this.makeMove = function (target) {
-        cTarget = target.split(' ');
+        movesMade++;
+        cTarget = target.split(' ')[0];
         var temp = $('.'+cSelected).html();
         console.log(cTarget);
-        $('.'+cSelected).html('');
+        $('.'+cSelected).html('&nbsp');
         $('.'+cTarget).html(temp);
         for(var i in valid_moves)
             $('.'+valid_moves[i]).removeClass('highlight');
+        updateViewTable();
+    };
+
+    function updateViewTable() {
+        if($('#turn').html() == "White") $('#turn').html("Black");
+        else $('#turn').html("White");
+        if(turn == 'black') $('#move-table>tbody>tr:last').append('<td>'+cSelected+'-'+cTarget+'</td>');
+        else $('#move-table > tbody:first').append('<tr>'+'<td>'+movesMade+'</td>' + '<td>'+cSelected+'-'+cTarget+'</td>'+'</tr>');
+        if(turn == 'white') turn = 'black';
+        else turn = 'white';
     }
 };
 

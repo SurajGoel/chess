@@ -9,7 +9,10 @@ html, body {
 
 #container{
     height: 100vh;
-    width: 50%;
+    min-width: 65%;
+    float: left;
+    margin-left: 20px;
+    margin-top: 20px;
 }
 
 table {
@@ -17,23 +20,37 @@ table {
     border-spacing: 0;
 }
 
-#chessboard, #left-table {
+#chessboard{
     height: 90%;
+}
+#left-table {
+    height: 92%;
 }
 #bottom-table {
     height: 10%;
 }
 
-#chessboard, #bottom-table{
+#chessboard{
     padding: 0px;
-    margin: 0 auto;
+    margin-left: 20px;
     border: 2px solid #181818;
     text-align: center;
-    width: 80%;
+    width: 65%;
 }
 
 #chessboard tr td {
+    font-size: 220%;
 }
+
+#bottom-table {
+    padding: 0px;
+    margin-left: 20px;
+    text-align: center;
+    font-size: 100%;
+    width: 65%;
+    border-collapse: collapse;
+}
+
 #bottom-table tr td {
     text-align: center;
 }
@@ -45,9 +62,31 @@ table {
     background: #9f9f9f;
 }
 #left-table {
+    text-align: center;
     float: left;
 }
 
 .highlight {
-    border: 4px solid red;
+    border: 2px solid red;
+    border-style: inset;
+}
+
+#information {
+    margin-top: 0px;
+    height: 100vh;
+}
+#move-table {
+    border: 2px solid #181818;
+    margin-top: 25px;
+    width: 25%;
+}
+#move-table tr {
+    border-bottom: 1px solid #181818;
+}
+#move-table td {
+    border-right: 1px solid #181818;
+    border-left: 1px solid #181818;
+}
+#move-table tr td {
+    padding: 5px;
 }
